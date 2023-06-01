@@ -37,9 +37,9 @@ class InfiniteTransformerLayer(Module):
     self.proj_value = nn.Linear(d, d, bias=False)
     
     self.psi = [None]
-    locations = torch.linspace(-0.5 , 1.5 , 0.1)
+    locations = torch.linspace(0, 1 , 1 / self.d_model)
+    self.__set_basis_functions(self.psi[0])
     self.G_inf = self.__calculate_G(self.psi, locations)
-    self.__set_basis_functions(self.psi)
 
   def __set_basis_functions(self, psi: GaussianBasisFunctions):
     sigmas = [.01, .05]
@@ -56,7 +56,7 @@ class InfiniteTransformerLayer(Module):
     I = torch.eye(self.n_basis)
     G = F.t().matmul((F.matmul(F.t()) + 1 * I).inverse())
 
-    return G.to(self.device)
+    return G
 
   def sample_discrete(self, x: torch.Tensor):
     B = torch.matmul(x, self.G_inf)
